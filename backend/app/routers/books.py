@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -36,7 +36,7 @@ def update_book(book_id: int, payload: BookUpdate, db: Session = Depends(get_db)
 
     data = payload.model_dump(exclude_unset=True)
     if data.get("status") == "read" and book.finished_at is None:
-        book.finished_at = datetime.utcnow()
+        book.finished_at = datetime.now(timezone.utc)
     if data.get("status") and data["status"] != "read":
         book.finished_at = None
 

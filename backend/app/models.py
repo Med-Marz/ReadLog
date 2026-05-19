@@ -1,8 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
 
 from app.database import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Book(Base):
@@ -16,7 +20,7 @@ class Book(Base):
     status = Column(String, nullable=False, default="to_read", index=True)
     rating = Column(Integer)
     review = Column(Text)
-    added_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    added_at = Column(DateTime, nullable=False, default=_utcnow)
     finished_at = Column(DateTime)
 
 
