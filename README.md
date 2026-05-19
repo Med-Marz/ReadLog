@@ -1,5 +1,7 @@
 # ReadLog
 
+![CI](https://github.com/Med-Marz/ReadLog/actions/workflows/ci.yml/badge.svg)
+
 A personal book tracker. Search the OpenLibrary catalog, organise your
 reading across three lists (**To Read** / **Reading** / **Read**), rate and
 review the books you finish, and track progress toward a yearly reading goal.
