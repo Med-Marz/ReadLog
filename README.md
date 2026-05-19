@@ -66,6 +66,24 @@ cd backend && pytest
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ```
 
+## Security
+
+- **Input validation** — every write endpoint uses Pydantic schemas with typed
+  fields, bounded ratings (1-5), bounded yearly goal (1-1000), and an enum-constrained
+  `status` (`to_read` / `reading` / `read`). Invalid payloads are rejected with `422`.
+- **CORS** — `CORSMiddleware` is configured with explicit allowed origins (no wildcard).
+  Origins are read from the `CORS_ORIGINS` environment variable.
+- **Secrets** — configuration is loaded from `.env` via `pydantic-settings`. `.env`
+  files are gitignored. OpenLibrary requires no API key, so no secret is hardcoded
+  anywhere in the codebase.
+- **SQL injection** — all database access goes through the SQLAlchemy ORM with
+  parameterized queries. No raw SQL string concatenation.
+- **Container hardening** — the backend container runs as a non-root `appuser`
+  with `nologin` shell. Both images use slim/alpine bases to reduce attack surface.
+- **Third-party isolation** — the browser never talks to OpenLibrary directly;
+  the backend proxies all external calls, keeping CORS tight and making the
+  outbound traffic auditable from one place.
+
 ## Project layout
 
 ```
