@@ -30,7 +30,7 @@
 
     - name: Wait for backend to respond
       ansible.builtin.uri:
-        url: http://localhost:8080/api/health
+        url: http://localhost:8090/api/health
         status_code: 200
       register: health
       retries: 20

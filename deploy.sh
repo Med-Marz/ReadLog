@@ -25,5 +25,5 @@ done
 
 echo ""
 echo "==> ReadLog is running."
-echo "    Frontend: http://localhost:8080"
-echo "    API:      http://localhost:8080/api/docs"
+echo "    Frontend: http://localhost:8090"
+echo "    API:      http://localhost:8090/api/docs"

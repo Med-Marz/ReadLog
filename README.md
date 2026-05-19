@@ -35,7 +35,7 @@ Requires Docker and Docker Compose.
 ./deploy.sh
 ```
 
-Then open <http://localhost:8080>.
+Then open <http://localhost:8090>.
 
 ## Local development
 
