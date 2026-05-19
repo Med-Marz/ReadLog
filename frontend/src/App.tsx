@@ -21,7 +21,7 @@ export default function App() {
         <div className="max-w-5xl mx-auto px-4 py-4 flex flex-wrap items-center gap-4">
           <div className="flex items-baseline gap-2">
             <h1 className="text-2xl font-bold text-slate-800">ReadLog</h1>
-            <span className="text-sm text-slate-400">Your personal book tracker</span>
+            <span className="text-sm text-slate-400">My books</span>
           </div>
           <nav className="ml-auto flex gap-1 bg-slate-100 rounded-lg p-1">
             <NavButton active={view === 'library'} onClick={() => setView('library')}>
