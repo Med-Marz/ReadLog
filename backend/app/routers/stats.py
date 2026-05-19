@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func
@@ -19,7 +19,7 @@ def _goal_key(year: int) -> str:
 
 @router.get("/stats")
 def get_stats(db: Session = Depends(get_db)):
-    year = datetime.utcnow().year
+    year = datetime.now(timezone.utc).year
 
     counts = dict(
         db.query(Book.status, func.count(Book.id)).group_by(Book.status).all()
@@ -32,6 +32,26 @@ def get_stats(db: Session = Depends(get_db)):
         .scalar()
         or 0
     )
+
+    top_authors_rows = (
+        db.query(Book.author, func.count(Book.id).label("n"))
+        .filter(Book.status == "read")
+        .filter(Book.author.isnot(None))
+        .filter(Book.author != "")
+        .group_by(Book.author)
+        .order_by(func.count(Book.id).desc())
+        .limit(5)
+        .all()
+    )
+    top_authors = [{"author": author, "count": count} for author, count in top_authors_rows]
+
+    average_rating_row = (
+        db.query(func.avg(Book.rating))
+        .filter(Book.status == "read")
+        .filter(Book.rating.isnot(None))
+        .scalar()
+    )
+    average_rating = round(float(average_rating_row), 2) if average_rating_row else None
 
     setting = db.get(Setting, _goal_key(year))
     goal = int(setting.value) if setting else DEFAULT_GOAL
@@ -46,19 +66,21 @@ def get_stats(db: Session = Depends(get_db)):
         "finished_this_year": finished_this_year,
         "goal": goal,
         "progress": round((finished_this_year / goal) * 100, 1) if goal else 0,
+        "top_authors": top_authors,
+        "average_rating": average_rating,
     }
 
 
 @router.get("/settings/goal", response_model=GoalOut)
 def get_goal(db: Session = Depends(get_db)):
-    year = datetime.utcnow().year
+    year = datetime.now(timezone.utc).year
     setting = db.get(Setting, _goal_key(year))
     return GoalOut(year=year, goal=int(setting.value) if setting else DEFAULT_GOAL)
 
 
 @router.put("/settings/goal", response_model=GoalOut)
 def set_goal(payload: GoalIn, db: Session = Depends(get_db)):
-    year = datetime.utcnow().year
+    year = datetime.now(timezone.utc).year
     key = _goal_key(year)
     setting = db.get(Setting, key)
     if setting:
