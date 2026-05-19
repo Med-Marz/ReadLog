@@ -36,6 +36,3 @@ backend/data/
 .idea/
 *.swp
 .DS_Store
-
-# Reference docs (not part of source)
-*.pdf
