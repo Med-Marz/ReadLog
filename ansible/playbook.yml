@@ -1,0 +1,38 @@
+---
+- name: Deploy ReadLog
+  hosts: readlog
+  become: false
+  vars:
+    project_dir: "{{ playbook_dir }}/.."
+
+  tasks:
+    - name: Check that docker is installed
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Check that docker compose is available
+      ansible.builtin.command: docker compose version
+      register: compose_version
+      changed_when: false
+
+    - name: Build container images
+      ansible.builtin.command: docker compose build
+      args:
+        chdir: "{{ project_dir }}"
+      changed_when: true
+
+    - name: Start services in detached mode
+      ansible.builtin.command: docker compose up -d
+      args:
+        chdir: "{{ project_dir }}"
+      changed_when: true
+
+    - name: Wait for backend to respond
+      ansible.builtin.uri:
+        url: http://localhost:8080/api/health
+        status_code: 200
+      register: health
+      retries: 20
+      delay: 2
+      until: health.status == 200
